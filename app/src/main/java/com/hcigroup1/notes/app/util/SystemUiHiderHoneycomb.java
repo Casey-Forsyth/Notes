@@ -1,4 +1,4 @@
-package com.example.app.util;
+package com.hcigroup1.notes.app.util;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

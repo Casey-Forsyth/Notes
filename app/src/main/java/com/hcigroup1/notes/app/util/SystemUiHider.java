@@ -1,4 +1,4 @@
-package com.example.app.util;
+package com.hcigroup1.notes.app.util;
 
 import android.app.Activity;
 import android.os.Build;
