@@ -5,6 +5,7 @@ import com.hcigroup1.notes.app.util.SystemUiHider;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class FullscreenActivity extends Activity {
     private ImageView eraser;
     private Button save_button;
     private Button next_button;
-    private int filename_inc = 0;
+    private static int filename_inc = 0;
 
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -97,9 +98,10 @@ public class FullscreenActivity extends Activity {
             @Override
             public void onClick(View v)
             {
-                DrawingView temp = (DrawingView) self.findViewById(R.id.drawingView);
-                drawingView.clear();
                 filename_inc ++;
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
             }
         });
 
