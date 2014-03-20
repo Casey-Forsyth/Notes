@@ -19,11 +19,13 @@ import java.io.IOException;
 public class MainActivity extends ActionBarActivity {
 
     private ImageView eraser;
+    private ImageView undo;
+    private ImageView redo;
     private Button save_button;
     private Button next_button;
     private static int filename_inc = 0;
     private LinearLayout drawingLayout;
-    private DrawingView drawingView;
+    private static DrawingView drawingView;
 
 
     @Override
@@ -33,25 +35,54 @@ public class MainActivity extends ActionBarActivity {
 
         drawingLayout = (LinearLayout) findViewById(R.id.drawingLayout);
 
-        drawingView = new DrawingView(drawingLayout.getContext());
+        if( drawingView == null )
+        {
+            drawingView = new DrawingView(drawingLayout.getContext());
+        }
+        else
+        {
+            drawingView = new DrawingView(drawingView, drawingLayout.getContext());
+        }
         drawingLayout.addView(drawingView);
 
         eraser = (ImageView) findViewById(R.id.eraser);
-        eraser.setOnClickListener(new View.OnClickListener() {
+        if (drawingView.isErasing())
+            eraser.setImageResource(R.drawable.pencil);
+        else
+            eraser.setImageResource(R.drawable.eraser);
+
+        eraser.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
 
-                if (drawingView.isEraserActive) {
-                    drawingView.isEraserActive = false;
-
+                if (drawingView.isErasing())
                     eraser.setImageResource(R.drawable.eraser);
-
-                } else {
-                    drawingView.isEraserActive = true;
-
+                else
                     eraser.setImageResource(R.drawable.pencil);
-                }
 
+                drawingView.toggleEraser();
+            }
+        });
+
+        undo = (ImageView) findViewById(R.id.undo);
+        undo.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                drawingView.onClickUndo();
+            }
+        });
+
+        redo = (ImageView) findViewById(R.id.redo);
+        redo.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                drawingView.onClickRedo();
             }
         });
 

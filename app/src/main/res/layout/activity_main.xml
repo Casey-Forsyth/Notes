@@ -33,19 +33,49 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/eraserView"
-        android:layout_width="50dp"
+        android:id="@+id/toolbarView"
+        android:layout_width="64dp"
         android:layout_height="fill_parent"
         android:background="@drawable/custom_edit_text"
         android:padding="5dp"
-        android:layout_above="@+id/linearLayout">
+        android:layout_above="@+id/linearLayout"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <Space
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/space0" />
 
         <ImageView
             android:id="@+id/eraser"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/eraser" />
+
+        <Space
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="center"
-            android:src="@drawable/eraser" />
+            android:id="@+id/space1" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:id="@+id/undo"
+            android:src="@drawable/undo" />
+
+        <Space
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/space2" />
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:id="@+id/redo"
+            android:src="@drawable/redo" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +83,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_above="@+id/linearLayout"
-        android:layout_toRightOf="@+id/eraserView"
+        android:layout_toRightOf="@+id/toolbarView"
         android:id="@+id/drawingLayout"></LinearLayout>
 
 </RelativeLayout>
