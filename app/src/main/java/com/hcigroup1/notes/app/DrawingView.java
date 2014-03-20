@@ -1,27 +1,18 @@
 package com.hcigroup1.notes.app;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Point;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+
+import java.util.ArrayList;
 
 public class DrawingView extends View implements OnTouchListener {
 	private Canvas  m_Canvas;
@@ -51,6 +42,19 @@ public class DrawingView extends View implements OnTouchListener {
 		onCanvasInitialization();
 	}
 
+    public DrawingView(Context context)
+    {
+        super(context);
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+
+        setBackgroundColor(Color.WHITE);
+
+        this.setOnTouchListener(this);
+
+        onCanvasInitialization();
+    }
+
 	public void onCanvasInitialization() {
 		m_Paint = new Paint();
 		m_Paint.setAntiAlias(true);
@@ -62,10 +66,6 @@ public class DrawingView extends View implements OnTouchListener {
 		m_Paint.setStrokeWidth(2);
 
 		m_Canvas = new Canvas();
-
-//        m_Bitmap = Bitmap.createBitmap(getWindowManager().getDefaultDisplay().getWidth(),
-//                                       getWindowManager().getDefaultDisplay().getHeight(),
-//                                       Bitmap.Config.ARGB_8888);
 
         m_BitmapPaint = new Paint(Paint.DITHER_FLAG);
 
@@ -79,6 +79,7 @@ public class DrawingView extends View implements OnTouchListener {
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
         m_Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        m_Bitmap.eraseColor(Color.WHITE);
         m_Canvas = new Canvas(m_Bitmap);
 	}
 
@@ -157,45 +158,10 @@ public class DrawingView extends View implements OnTouchListener {
 		paths.add(new Pair<Path, Paint>(m_Path, newPaint));
 	}
 
-    public void clear()
-    {
-        System.out.println("Test");
-        this.onClickUndo();
-//        this.onCanvasInitialization();
-//
-//        m_Path.reset();
-//        m_Path = new Path();
-//        paths = new ArrayList<Pair<Path, Paint>>();
-//        undonePaths = new ArrayList<Pair<Path, Paint>>();
-//        m_Canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-//
-//        m_Canvas = new Canvas();
-//        //m_Canvas.
-//        //m_Canvas.drawColor(Color.BLACK);
-//        //m_Canvas.drawColor(Color.WHITE);
-//
-//        Paint clearPaint = new Paint();
-//        clearPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-//        m_Canvas.drawRect(0, 0, m_Canvas.getWidth(), m_Canvas.getHeight(), clearPaint);
-//
-//        m_Bitmap.eraseColor(Color.WHITE);
-//        m_Canvas.drawBitmap(m_Bitmap, 0, 0, m_BitmapPaint);
-
-    }
-
     public Bitmap getBitmap()
     {
         return m_Bitmap;
     }
-
-//    @Override
-//    public void onClick(View v)
-//    {
-//        this.clear();
-//        Button b = (Button) v;
-//        b.setBackgroundColor(Color.RED);
-//        b.invalidate();
-//    }
 
 //	public void onClickPenColorButton(int penColor) {
 //
