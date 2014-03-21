@@ -42,39 +42,27 @@
         android:orientation="vertical"
         android:weightSum="1">
 
-        <Space
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/space0" />
-
         <ImageView
             android:id="@+id/eraser"
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/eraser" />
-
-        <Space
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/space1" />
+            android:src="@drawable/eraser"
+            android:layout_weight="0.25"/>
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:id="@+id/undo"
-            android:src="@drawable/undo" />
-
-        <Space
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:id="@+id/space2" />
+            android:src="@drawable/undo"
+            android:layout_weight="0.25"/>
 
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:id="@+id/redo"
-            android:src="@drawable/redo" />
+            android:src="@drawable/redo"
+            android:layout_weight="0.25"/>
 
     </LinearLayout>
 
