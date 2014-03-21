@@ -21,7 +21,6 @@ public class DrawingView extends View implements OnTouchListener {
 	private Path    m_Path;
 	private Paint   m_Paint;
     private Bitmap  m_Bitmap;
-    private Paint   m_BitmapPaint;
     private int     paintColour;
 
 	ArrayList<Pair<Path, Paint>> paths = new ArrayList<Pair<Path, Paint>>();
@@ -53,9 +52,12 @@ public class DrawingView extends View implements OnTouchListener {
     public DrawingView(DrawingView oldView, Context context)
     {
         this(context);
-        m_Bitmap = oldView.getBitmap();
-
-        isEraserActive = oldView.isEraserActive;
+//        m_Bitmap = oldView.getBitmap();
+        paintColour     = oldView.paintColour;
+        isEraserActive  = oldView.isEraserActive;
+        m_Paint         = new Paint(oldView.m_Paint);
+        paths           = oldView.paths;
+        undonePaths     = oldView.undonePaths;
     }
 
 	public void onCanvasInitialization() {
@@ -72,10 +74,8 @@ public class DrawingView extends View implements OnTouchListener {
 
 		m_Canvas = null;//new Canvas();
 
-        m_BitmapPaint = new Paint(Paint.DITHER_FLAG);
-
-		m_Path = new Path();
-		Paint newPaint = new Paint(m_Paint);
+        m_Path = new Path();
+//		Paint newPaint = new Paint(m_Paint);
 //		paths.add(new Pair<Path, Paint>(m_Path, newPaint));
 
         maxX = maxY = 0;
@@ -174,12 +174,6 @@ public class DrawingView extends View implements OnTouchListener {
 	private void touch_up() {
 		m_Path.lineTo(mX, mY);
 
-		// commit the path to our offscreen
-//		m_Canvas.drawPath(m_Path, m_Paint);
-
-        if(m_Path.isEmpty())
-            paths.remove(paths.size()-1);
-
         m_Path = new Path();
 		Paint newPaint = new Paint(m_Paint); // Clones the mPaint object
 	}
@@ -191,24 +185,6 @@ public class DrawingView extends View implements OnTouchListener {
         return m_Bitmap;
     }
 
-//	public void onClickPenColorButton(int penColor) {
-//
-//		if (isEraserActive) {
-//			m_Paint.setColor(Color.WHITE);
-//			Paint newPaint = new Paint(m_Paint); // Clones the mPaint object
-//			paths.add(new Pair<Path, Paint>(m_Path, newPaint));
-//
-//			isEraserActive = false;
-//		} else {
-//			m_Paint.setColor(Color.RED);
-//			Paint newPaint = new Paint(m_Paint); // Clones the mPaint object
-//			paths.add(new Pair<Path, Paint>(m_Path, newPaint));
-//
-//			isEraserActive = true;
-//		}
-//
-//	}
-//
 	public void onClickUndo()
     {
 		if (paths.size() > 0)

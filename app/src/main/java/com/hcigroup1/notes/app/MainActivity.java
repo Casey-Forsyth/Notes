@@ -94,8 +94,6 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
             @Override
             public void onClick(View v)
             {
-//                ColourPickerDialogFragment colourPicker = new ColourPickerDialogFragment();
-//                colourPicker.show(getFragmentManager(), "colour");
                 FragmentManager fragmentManager = getFragmentManager();
                 ColourPickerDialogFragment colourPicker = new ColourPickerDialogFragment();
 
