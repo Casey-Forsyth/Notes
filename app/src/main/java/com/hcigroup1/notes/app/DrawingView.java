@@ -22,6 +22,7 @@ public class DrawingView extends View implements OnTouchListener {
 	private Paint   m_Paint;
     private Bitmap  m_Bitmap;
     private Paint   m_BitmapPaint;
+    private int     paintColour;
 
 	ArrayList<Pair<Path, Paint>> paths = new ArrayList<Pair<Path, Paint>>();
 	ArrayList<Pair<Path, Paint>> undonePaths = new ArrayList<Pair<Path, Paint>>();
@@ -66,6 +67,8 @@ public class DrawingView extends View implements OnTouchListener {
 		m_Paint.setStrokeJoin(Paint.Join.ROUND);
 		m_Paint.setStrokeCap(Paint.Cap.ROUND);
 		m_Paint.setStrokeWidth(2);
+
+        paintColour = Color.BLACK;
 
 		m_Canvas = null;//new Canvas();
 
@@ -139,7 +142,7 @@ public class DrawingView extends View implements OnTouchListener {
 		}
         else
         {
-			m_Paint.setColor(Color.BLACK);
+			m_Paint.setColor(paintColour);
 			m_Paint.setStrokeWidth(2);
 		}
 
@@ -224,4 +227,8 @@ public class DrawingView extends View implements OnTouchListener {
 		}
 	}
 
+    public void setPaintColour(int selectedColour)
+    {
+        paintColour = selectedColour;
+    }
 }

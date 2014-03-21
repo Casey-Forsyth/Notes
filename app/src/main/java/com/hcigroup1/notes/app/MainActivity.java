@@ -1,11 +1,11 @@
 package com.hcigroup1.notes.app;
 
+import android.app.Activity;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,11 +16,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity implements ColourPickerDialogFragment.ColourPickerDialogListener
+{
 
     private ImageView eraser;
     private ImageView undo;
     private ImageView redo;
+    private ImageView picker;
     private Button save_button;
     private Button next_button;
     private static int filename_inc = 0;
@@ -86,6 +88,23 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
+        picker = (ImageView) findViewById(R.id.picker);
+        picker.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+//                ColourPickerDialogFragment colourPicker = new ColourPickerDialogFragment();
+//                colourPicker.show(getFragmentManager(), "colour");
+                FragmentManager fragmentManager = getFragmentManager();
+                ColourPickerDialogFragment colourPicker = new ColourPickerDialogFragment();
+
+                // Show the fragment as a dialog
+                colourPicker.show(fragmentManager, "dialog");
+
+            }
+        });
+
         next_button = (Button) findViewById(R.id.next_button);
         next_button.setOnClickListener(new View.OnClickListener()
         {
@@ -124,25 +143,31 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
+    public void onDialogClick(DialogFragment dialog)
+    {
+        drawingView.setPaintColour(((ColourPickerDialogFragment)dialog).getSelectedColour());
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//        if (id == R.id.action_settings) {
+//            return true;
+//        }
+//        return super.onOptionsItemSelected(item);
+//    }
 
 }
