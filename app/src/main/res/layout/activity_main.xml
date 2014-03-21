@@ -43,10 +43,9 @@
         android:weightSum="1">
 
         <ImageView
-            android:id="@+id/eraser"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_gravity="center_vertical"
+            android:id="@+id/eraser"
             android:src="@drawable/eraser"
             android:layout_weight="0.25"/>
 
@@ -62,6 +61,13 @@
             android:layout_height="48dp"
             android:id="@+id/redo"
             android:src="@drawable/redo"
+            android:layout_weight="0.25"/>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:id="@+id/picker"
+            android:src="@drawable/colour_wheel"
             android:layout_weight="0.25"/>
 
     </LinearLayout>
