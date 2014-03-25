@@ -20,7 +20,6 @@ import java.util.TimerTask;
 
 public class MainActivity extends Activity implements ColourPickerDialogFragment.ColourPickerDialogListener
 {
-
     private ImageView eraser;
     private ImageView undo;
     private ImageView redo;
@@ -30,13 +29,12 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
     private static int filename_inc = 0;
     private LinearLayout drawingLayout;
     private static DrawingView drawingView;
-//    private Runnable runnable;
-//    private Handler handler;
     private Timer timer;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -128,40 +126,8 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
             public void onClick(View v)
             {
                 saveImage();
-
-
-//                Bitmap b = drawingView.getBitmap();
-//                FileOutputStream fos = null;
-//
-//                try
-//                {
-//                    File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-//                    File file = new File(dir, "drawing"+filename_inc+".png");
-//                    fos = new FileOutputStream(file);
-//                    b.compress(Bitmap.CompressFormat.PNG, 95, fos);
-//                    fos.close();
-//                }
-//                catch (IOException e)
-//                {
-//                    e.printStackTrace();
-//                }
-
             }
         });
-
-//        runnable = new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                saveImage();
-//                handler.postDelayed(this, 1500);
-//            }
-//        };
-
-//
-//        handler = new Handler();
-//        handler.postDelayed(runnable, 1500);
 
         timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask()
@@ -172,44 +138,28 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
                 saveImage();
             }
         }, 1500, 1500);
-
     }
 
     @Override
     public void onDialogClick(DialogFragment dialog)
     {
         drawingView.setPaintColour(((ColourPickerDialogFragment)dialog).getSelectedColour());
+
+        if(drawingView.isErasing())
+        {
+            drawingView.toggleEraser();
+            eraser.setImageResource(R.drawable.eraser);
+        }
     }
-
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//
-//        // Inflate the menu; this adds items to the action bar if it is present.
-//        getMenuInflater().inflate(R.menu.main, menu);
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        // Handle action bar item clicks here. The action bar will
-//        // automatically handle clicks on the Home/Up button, so long
-//        // as you specify a parent activity in AndroidManifest.xml.
-//        int id = item.getItemId();
-//        if (id == R.id.action_settings) {
-//            return true;
-//        }
-//        return super.onOptionsItemSelected(item);
-//    }
 
     private void saveImage()
     {
         try
         {
             Bitmap b = drawingView.getBitmap();
-//            drawingView.buildDrawingCache();
-//            Bitmap b = drawingView.getDrawingCache();
-            FileOutputStream fos = null;
+            //            drawingView.buildDrawingCache();
+            //            Bitmap b = drawingView.getDrawingCache();
+            FileOutputStream fos; // = null;
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             File file = new File(dir, "drawing"+filename_inc+".png");
             fos = new FileOutputStream(file);
@@ -220,6 +170,5 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
         {
             e.printStackTrace();
         }
-
     }
 }

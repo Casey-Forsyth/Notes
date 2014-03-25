@@ -18,22 +18,25 @@ import java.util.ListIterator;
 
 import static java.lang.Math.max;
 
-public class DrawingView extends View implements OnTouchListener {
-	private Canvas  m_Canvas;
-	private Path    m_Path;
-	private Paint   m_Paint;
+public class DrawingView extends View implements OnTouchListener
+{
+    private Canvas  m_Canvas;
+    private Path    m_Path;
+    private Paint   pen_paint;
+    private Paint   eraser_paint;
     private Bitmap  m_Bitmap;
     private int     paintColour;
+    private int     eraseColour;
 
-	ArrayList<Pair<Path, Paint>> paths = new ArrayList<Pair<Path, Paint>>();
-	ArrayList<Pair<Path, Paint>> undonePaths = new ArrayList<Pair<Path, Paint>>();
+    ArrayList<Pair<Path, Paint>> paths = new ArrayList<Pair<Path, Paint>>();
+    ArrayList<Pair<Path, Paint>> undonePaths = new ArrayList<Pair<Path, Paint>>();
 
-	private float mX, mY;
+    private float mX, mY;
     private float maxX, maxY;
 
-	private static final float TOUCH_TOLERANCE = 4;
+    private static final float TOUCH_TOLERANCE = 4;
 
-	private boolean isEraserActive;
+    private boolean isEraserActive;
 
     public DrawingView(Context context)
     {
@@ -46,54 +49,61 @@ public class DrawingView extends View implements OnTouchListener {
         onCanvasInitialization();
     }
 
-	public DrawingView(Context context, AttributeSet attr)
+    public DrawingView(Context context, AttributeSet attr)
     {
         this(context);
-	}
+    }
 
     public DrawingView(DrawingView oldView, Context context)
     {
         this(context);
-//        m_Bitmap = oldView.getBitmap();
+        //        m_Bitmap = oldView.getBitmap();
         paintColour     = oldView.paintColour;
         isEraserActive  = oldView.isEraserActive;
-        m_Paint         = new Paint(oldView.m_Paint);
+        pen_paint = new Paint(oldView.pen_paint);
         paths           = oldView.paths;
         undonePaths     = oldView.undonePaths;
     }
 
-	public void onCanvasInitialization() {
-		m_Paint = new Paint();
-		m_Paint.setAntiAlias(true);
-		m_Paint.setDither(true);
-		m_Paint.setColor(Color.parseColor("#000000")); 
-		m_Paint.setStyle(Paint.Style.STROKE);
-		m_Paint.setStrokeJoin(Paint.Join.ROUND);
-		m_Paint.setStrokeCap(Paint.Cap.ROUND);
-		m_Paint.setStrokeWidth(2);
-
+    public void onCanvasInitialization()
+    {
         paintColour = Color.BLACK;
+        eraseColour = Color.WHITE;
 
-		m_Canvas = null;//new Canvas();
+        pen_paint = new Paint();
+        pen_paint.setAntiAlias(true);
+        pen_paint.setDither(true);
+        pen_paint.setColor(paintColour);
+        pen_paint.setStyle(Paint.Style.STROKE);
+        pen_paint.setStrokeJoin(Paint.Join.ROUND);
+        pen_paint.setStrokeCap(Paint.Cap.ROUND);
+        pen_paint.setStrokeWidth(2);
+
+
+        eraser_paint = new Paint(pen_paint);
+        eraser_paint.setColor(eraseColour);
+        eraser_paint.setStrokeWidth(32);
+
+        m_Canvas = null;//new Canvas();
 
         m_Path = new Path();
-//		Paint newPaint = new Paint(m_Paint);
-//		paths.add(new Pair<Path, Paint>(m_Path, newPaint));
+        //		Paint newPaint = new Paint(pen_paint);
+        //		paths.add(new Pair<Path, Paint>(m_Path, newPaint));
 
         maxX = maxY = 0;
-	}
+    }
 
-	@Override
-	protected void onSizeChanged(int w, int h, int oldw, int oldh)
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh)
     {
-		super.onSizeChanged(w, h, oldw, oldh);
+        super.onSizeChanged(w, h, oldw, oldh);
 
         m_Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         m_Canvas = new Canvas(m_Bitmap);
 
         invalidate();
 
-	}
+    }
 
     public void toggleEraser()
     {
@@ -105,32 +115,32 @@ public class DrawingView extends View implements OnTouchListener {
         return isEraserActive;
     }
 
-	public boolean onTouch(View arg0, MotionEvent event) {
-		float x = event.getX();
-		float y = event.getY();
+    public boolean onTouch(View arg0, MotionEvent event)
+    {
+        float x = event.getX();
+        float y = event.getY();
 
-		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			touch_start(x, y);
-			invalidate();
-			break;
-		case MotionEvent.ACTION_MOVE:
-			touch_move(x, y);
-			invalidate();
-			break;
-		case MotionEvent.ACTION_UP:
-			touch_up();
-			invalidate();
-			break;
-		}
-		return true;
-	}
+        switch (event.getAction())
+        {
+            case MotionEvent.ACTION_DOWN:
+                touch_start(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                touch_move(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                touch_up();
+                invalidate();
+                break;
+        }
+        return true;
+    }
 
-	@Override
+    @Override
     protected void onDraw (Canvas canvas)
     {
-        m_Bitmap.eraseColor(Color.WHITE);
-
         ListIterator<Pair<Path, Paint>> iter = paths.listIterator();
         Pair<Path, Paint> p;
 
@@ -141,93 +151,89 @@ public class DrawingView extends View implements OnTouchListener {
                 p = iter.next();
                 canvas.drawPath(p.first, p.second);
                 m_Canvas.drawPath(p.first, p.second);
-
             }
         }
         catch(ConcurrentModificationException e)
         {
             System.out.print("ConcurrentModificationException");
         }
-
-//        for (Pair<Path, Paint> p : paths)
-//        {
-//			canvas.drawPath(p.first, p.second);
-//        }
     }
 
-	private void touch_start(float x, float y)
+    private void touch_start(float x, float y)
     {
-		
-		if (isEraserActive)
+        Paint paint;
+
+        if (isEraserActive)
         {
-			m_Paint.setColor(Color.WHITE);
-			m_Paint.setStrokeWidth(32);
-		}
+            paint = eraser_paint;
+        }
         else
         {
-			m_Paint.setColor(paintColour);
-			m_Paint.setStrokeWidth(2);
-		}
+            paint = pen_paint;
+        }
 
-        Paint newPaint = new Paint(m_Paint); // Clones the mPaint object
+        Paint newPaint = new Paint(paint);
         paths.add(new Pair<Path, Paint>(m_Path, newPaint));
 
-		m_Path.reset();
-		m_Path.moveTo(x, y);
-		mX = x;
-		mY = y;
+        m_Path.reset();
+        m_Path.moveTo(x, y);
+        mX = x;
+        mY = y;
 
         maxX = max(x, maxX);
         maxY = max(y, maxY);
-	}
+    }
 
-	private void touch_move(float x, float y)
+    private void touch_move(float x, float y)
     {
-		float dx = Math.abs(x - mX);
-		float dy = Math.abs(y - mY);
-		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-			m_Path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-			mX = x;
-			mY = y;
+        float dx = Math.abs(x - mX);
+        float dy = Math.abs(y - mY);
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE)
+        {
+            m_Path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
 
             maxX = max(x, maxX);
             maxY = max(y, maxY);
-		}
-	}
+        }
+    }
 
-	private void touch_up()
+    private void touch_up()
     {
-		m_Path.lineTo(mX, mY);
+        m_Path.lineTo(mX, mY);
 
         m_Path = new Path();
-	}
+    }
 
     public Bitmap getBitmap()
     {
         return m_Bitmap;
     }
 
-	public void onClickUndo()
+    public void onClickUndo()
     {
-		if (paths.size() > 0)
+        if (paths.size() > 0)
         {
             undonePaths.add(paths.remove(paths.size() - 1));
+            m_Bitmap.eraseColor(Color.WHITE);
             invalidate();
         }
-	}
+    }
 
-	public void onClickRedo()
+    public void onClickRedo()
     {
-		if (undonePaths.size() > 0)
+        if (undonePaths.size() > 0)
         {
-			paths.add(undonePaths.remove(undonePaths.size() - 1));
+            paths.add(undonePaths.remove(undonePaths.size() - 1));
             invalidate();
-		}
-	}
+        }
+    }
 
     public void setPaintColour(int selectedColour)
     {
         paintColour = selectedColour;
+        pen_paint.setColor(paintColour);
     }
 
 }
