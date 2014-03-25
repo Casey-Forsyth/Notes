@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.ListIterator;
 
 import static java.lang.Math.max;
 
@@ -125,15 +127,36 @@ public class DrawingView extends View implements OnTouchListener {
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas)
+    protected void onDraw (Canvas canvas)
     {
-        for (Pair<Path, Paint> p : paths)
+        m_Bitmap.eraseColor(Color.WHITE);
+
+        ListIterator<Pair<Path, Paint>> iter = paths.listIterator();
+        Pair<Path, Paint> p;
+
+        try
         {
-			canvas.drawPath(p.first, p.second);
+            while (iter.hasNext())
+            {
+                p = iter.next();
+                canvas.drawPath(p.first, p.second);
+                m_Canvas.drawPath(p.first, p.second);
+
+            }
         }
+        catch(ConcurrentModificationException e)
+        {
+            System.out.print("ConcurrentModificationException");
+        }
+
+//        for (Pair<Path, Paint> p : paths)
+//        {
+//			canvas.drawPath(p.first, p.second);
+//        }
     }
 
-	private void touch_start(float x, float y) {
+	private void touch_start(float x, float y)
+    {
 		
 		if (isEraserActive)
         {
@@ -158,7 +181,8 @@ public class DrawingView extends View implements OnTouchListener {
         maxY = max(y, maxY);
 	}
 
-	private void touch_move(float x, float y) {
+	private void touch_move(float x, float y)
+    {
 		float dx = Math.abs(x - mX);
 		float dy = Math.abs(y - mY);
 		if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
@@ -171,17 +195,15 @@ public class DrawingView extends View implements OnTouchListener {
 		}
 	}
 
-	private void touch_up() {
+	private void touch_up()
+    {
 		m_Path.lineTo(mX, mY);
 
         m_Path = new Path();
-		Paint newPaint = new Paint(m_Paint); // Clones the mPaint object
 	}
 
     public Bitmap getBitmap()
     {
-        m_Bitmap.eraseColor(Color.WHITE);
-        onDraw(m_Canvas);
         return m_Bitmap;
     }
 
@@ -207,4 +229,5 @@ public class DrawingView extends View implements OnTouchListener {
     {
         paintColour = selectedColour;
     }
+
 }

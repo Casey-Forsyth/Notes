@@ -6,7 +6,6 @@ import android.app.FragmentManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MainActivity extends Activity implements ColourPickerDialogFragment.ColourPickerDialogListener
@@ -30,9 +30,8 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
     private static int filename_inc = 0;
     private LinearLayout drawingLayout;
     private static DrawingView drawingView;
-    private Runnable runnable;
-    private Runnable runnable2;
-    private Handler handler;
+//    private Runnable runnable;
+//    private Handler handler;
     private Timer timer;
 
 
@@ -128,7 +127,8 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
             @Override
             public void onClick(View v)
             {
-                handler.post(runnable);
+                saveImage();
+
 
 //                Bitmap b = drawingView.getBitmap();
 //                FileOutputStream fos = null;
@@ -149,29 +149,29 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
             }
         });
 
-        runnable = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                saveImage();
-            }
-        };
+//        runnable = new Runnable()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                saveImage();
+//                handler.postDelayed(this, 1500);
+//            }
+//        };
 
-        runnable2 = new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                saveImage();
-                handler.postDelayed(this, 1500);
-            }
-        };
-
-        handler = new Handler();
-        handler.postDelayed(runnable2, 1500);
+//
+//        handler = new Handler();
+//        handler.postDelayed(runnable, 1500);
 
         timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                saveImage();
+            }
+        }, 1500, 1500);
 
     }
 
@@ -204,11 +204,12 @@ public class MainActivity extends Activity implements ColourPickerDialogFragment
 
     private void saveImage()
     {
-        Bitmap b = drawingView.getBitmap();
-        FileOutputStream fos = null;
-
         try
         {
+            Bitmap b = drawingView.getBitmap();
+//            drawingView.buildDrawingCache();
+//            Bitmap b = drawingView.getDrawingCache();
+            FileOutputStream fos = null;
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
             File file = new File(dir, "drawing"+filename_inc+".png");
             fos = new FileOutputStream(file);
