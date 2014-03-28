@@ -16,15 +16,15 @@ import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.ListIterator;
 
-import static java.lang.Math.max;
-
 public class DrawingView extends View implements OnTouchListener
 {
-    private Canvas  m_Canvas;
+    private Canvas  back_canvas;
+    private Canvas  front_canvas;
     private Path    m_Path;
     private Paint   pen_paint;
     private Paint   eraser_paint;
-    private Bitmap  m_Bitmap;
+    private Bitmap  back_bitmap;
+    private Bitmap  front_bitmap;
     private int     paintColour;
     private int     eraseColour;
 
@@ -32,7 +32,7 @@ public class DrawingView extends View implements OnTouchListener
     ArrayList<Pair<Path, Paint>> undonePaths = new ArrayList<Pair<Path, Paint>>();
 
     private float mX, mY;
-    private float maxX, maxY;
+    private float startX, startY;
 
     private static final float TOUCH_TOLERANCE = 4;
 
@@ -57,7 +57,7 @@ public class DrawingView extends View implements OnTouchListener
     public DrawingView(DrawingView oldView, Context context)
     {
         this(context);
-        //        m_Bitmap = oldView.getBitmap();
+        //        back_bitmap = oldView.getBitmap();
         paintColour     = oldView.paintColour;
         isEraserActive  = oldView.isEraserActive;
         pen_paint = new Paint(oldView.pen_paint);
@@ -84,13 +84,12 @@ public class DrawingView extends View implements OnTouchListener
         eraser_paint.setColor(eraseColour);
         eraser_paint.setStrokeWidth(32);
 
-        m_Canvas = null;//new Canvas();
+        back_canvas = null;//new Canvas();
 
         m_Path = new Path();
         //		Paint newPaint = new Paint(pen_paint);
         //		paths.add(new Pair<Path, Paint>(m_Path, newPaint));
 
-        maxX = maxY = 0;
     }
 
     @Override
@@ -98,8 +97,11 @@ public class DrawingView extends View implements OnTouchListener
     {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        m_Bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        m_Canvas = new Canvas(m_Bitmap);
+        back_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        back_canvas = new Canvas(back_bitmap);
+
+        front_bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        front_canvas = new Canvas(front_bitmap);
 
         invalidate();
 
@@ -139,10 +141,12 @@ public class DrawingView extends View implements OnTouchListener
     }
 
     @Override
-    protected void onDraw (Canvas canvas)
+    protected synchronized void onDraw (Canvas canvas)
     {
         ListIterator<Pair<Path, Paint>> iter = paths.listIterator();
         Pair<Path, Paint> p;
+
+        back_bitmap.eraseColor(Color.WHITE);
 
         try
         {
@@ -150,13 +154,33 @@ public class DrawingView extends View implements OnTouchListener
             {
                 p = iter.next();
                 canvas.drawPath(p.first, p.second);
-                m_Canvas.drawPath(p.first, p.second);
+                back_canvas.drawPath(p.first, p.second);
             }
         }
         catch(ConcurrentModificationException e)
         {
             System.out.print("ConcurrentModificationException");
         }
+
+        swap_buffers();
+
+//        front_bitmap = back_bitmap;
+//        back_bitmap = Bitmap.createBitmap(front_bitmap);
+//        back_canvas = new Canvas(back_bitmap);
+    }
+
+    private void swap_buffers()
+    {
+        Bitmap btemp;
+        Canvas ctemp;
+
+        btemp = back_bitmap;
+        back_bitmap = front_bitmap;
+        front_bitmap = btemp;
+
+        ctemp = back_canvas;
+        back_canvas = front_canvas;
+        front_canvas = ctemp;
     }
 
     private void touch_start(float x, float y)
@@ -180,8 +204,8 @@ public class DrawingView extends View implements OnTouchListener
         mX = x;
         mY = y;
 
-        maxX = max(x, maxX);
-        maxY = max(y, maxY);
+        startX = x;
+        startY = y;
     }
 
     private void touch_move(float x, float y)
@@ -193,22 +217,26 @@ public class DrawingView extends View implements OnTouchListener
             m_Path.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
-
-            maxX = max(x, maxX);
-            maxY = max(y, maxY);
         }
     }
 
     private void touch_up()
     {
-        m_Path.lineTo(mX, mY);
+        if( startX == mX && startY == mY )
+        {
+            m_Path.addCircle(mX, mY, 2, Path.Direction.CW);
+        }
+        else
+        {
+            m_Path.lineTo(mX, mY);
+        }
 
         m_Path = new Path();
     }
 
     public Bitmap getBitmap()
     {
-        return m_Bitmap;
+        return front_bitmap;
     }
 
     public void onClickUndo()
@@ -216,7 +244,6 @@ public class DrawingView extends View implements OnTouchListener
         if (paths.size() > 0)
         {
             undonePaths.add(paths.remove(paths.size() - 1));
-            m_Bitmap.eraseColor(Color.WHITE);
             invalidate();
         }
     }
